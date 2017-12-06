@@ -14,10 +14,10 @@ public class FindGeneCode {
 		String[] chosedGeneHead=new String[] {"GAG","AAA","AAT"};
 		File seqsFile=new File("C:\\Users\\Alleyne\\Documents\\javaStudy\\R.txt");
 		Map<String, String> seqsMap=getSeqsMap(seqsFile,chosedGeneHead);
-		for(Map.Entry<String,String> entry:seqsMap.entrySet()) {
+		/*for(Map.Entry<String,String> entry:seqsMap.entrySet()) {
 			System.out.println(entry.getKey()+"="+entry.getValue());
 		}
-		System.out.println(seqsMap);
+		System.out.println(seqsMap);*/
 		File codesFile=new File("C:\\Users\\Alleyne\\Documents\\javaStudy\\T.txt");
 		Map<String, String> codesMap=getCodesMap(codesFile);
 		File[] subFiles=new File("C:\\Users\\Alleyne\\Documents\\javaStudy\\pta").listFiles();
@@ -63,18 +63,30 @@ public class FindGeneCode {
 		String result=null;
 		try(BufferedReader br=new BufferedReader(new FileReader(geneFile))){
 			String str = null;
-			while((str=br.readLine())!=null) geneSb.append(str);
-			String gene=geneSb.toString();
-			TreeMap<Integer, String> tMap=new TreeMap<>();
-			seqsMap.forEach((k,v)->{//遍历map集合中基因序列，查找与基因文件匹配的序列，将对应编码
-				Integer i;			//及基因序列在基因文件中的索引放入TreeMap中,保证顺序
-				if((i=gene.indexOf(v))!=-1) {
-					tMap.put(i, k);
+			
+			while((str=br.readLine())!=null) geneSb.append(str);//将基因文件读入内存
+			
+		/*从基因文件开头往后匹配，匹配到序列，则删除基因文件开头匹配到的序列，未匹配到，则删除文件第一个字符，继续匹配循环*/	
+			
+			while(geneSb.length()>0) {
+				boolean flag=false;//匹配成功标志
+				for(Entry entry:seqsMap.entrySet()) {
+					String k=(String) entry.getKey();
+					String v=(String) entry.getValue();
+					if(geneSb.length()>=v.length()&&v.equals(geneSb.substring(0, v.length()))) {
+						geneSb.delete(0, v.length());
+						geneCodeSb.append(k+"-");
+						flag=true;
+						break;
+					}
+					else {
+						flag=false;
+					}
 				}
-			});
-			for(Entry entry:tMap.entrySet()) {
-				geneCodeSb.append(entry.getValue()+"-");
+				if(!flag)geneSb.deleteCharAt(0);
+
 			}
+
 			result=geneCodeSb.toString();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
