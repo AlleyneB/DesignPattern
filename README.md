@@ -1,2 +1,3 @@
 # MyPro
-exercise
+geneCode
+
